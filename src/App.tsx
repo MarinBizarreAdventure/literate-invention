@@ -1,21 +1,83 @@
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
+function useTypingEffect(text: string, speed = 100) {
+  const [displayed, setDisplayed] = useState('')
+  const [done, setDone] = useState(false)
+
+  useEffect(() => {
+    let i = 0
+    const interval = setInterval(() => {
+      setDisplayed(text.slice(0, i + 1))
+      i++
+      if (i >= text.length) {
+        clearInterval(interval)
+        setDone(true)
+      }
+    }, speed)
+    return () => clearInterval(interval)
+  }, [text, speed])
+
+  return { displayed, done }
+}
+
+function useScrollReveal() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
+      { threshold: 0.15 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return { ref, visible }
+}
+
+function RevealSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  const { ref, visible } = useScrollReveal()
+  return (
+    <div ref={ref} className={`reveal ${visible ? 'reveal--visible' : ''} ${className}`}>
+      {children}
+    </div>
+  )
+}
+
+const skills = {
+  Languages: ['Go', 'Python', 'SQL', 'C#/.NET'],
+  Frameworks: ['Gin', 'Echo', 'GORM', 'FastAPI', 'PyTorch', 'TensorFlow'],
+  Infrastructure: ['AWS', 'Docker', 'Kubernetes', 'CI/CD', 'gRPC', 'Microservices'],
+  Databases: ['PostgreSQL', 'Redis', 'MongoDB'],
+}
+
 function App() {
+  const { displayed, done } = useTypingEffect('MARIN NEGAI', 120)
+
   return (
     <div className="container">
+      <div className="accent-line" />
+
       <header className="hero">
-        <h1>MARIN NEGAI</h1>
+        <h1>
+          {displayed}
+          <span className={`cursor ${done ? 'cursor--blink' : ''}`}>|</span>
+        </h1>
         <p>Software Engineer · Machine Learning Engineer</p>
         <div className="links">
-          <a href="mailto:marinnegai@gmail.com">Email</a>
-          <a href="https://linkedin.com/in/marinnegai" target="_blank" rel="noreferrer">LinkedIn</a>
-          <a href="https://github.com/MarinBizarreAdventure" target="_blank" rel="noreferrer">GitHub</a>
+          <a className="link-hover" href="mailto:marinnegai@gmail.com">Email</a>
+          <a className="link-hover" href="https://linkedin.com/in/marinnegai" target="_blank" rel="noreferrer">LinkedIn</a>
+          <a className="link-hover" href="https://github.com/MarinBizarreAdventure" target="_blank" rel="noreferrer">GitHub</a>
         </div>
       </header>
 
-      <section className="section">
-        <h2>Experience</h2>
-        
+      <RevealSection className="section">
+        <h2 className="section-heading">Experience</h2>
+
         <div className="experience-item">
           <div className="item-header">
             <h3>Machine Learning Engineer</h3>
@@ -56,32 +118,26 @@ function App() {
             <li>Designed database schemas with PostgreSQL; wrote migrations and optimized queries</li>
           </ul>
         </div>
-      </section>
+      </RevealSection>
 
-      <section className="section">
-        <h2>Skills</h2>
+      <RevealSection className="section">
+        <h2 className="section-heading">Skills</h2>
         <div className="skills-grid">
-          <div className="skill-category">
-            <h4>Languages</h4>
-            <p>Go, Python, SQL, C#/.NET</p>
-          </div>
-          <div className="skill-category">
-            <h4>Frameworks</h4>
-            <p>Gin, Echo, GORM, FastAPI, PyTorch, TensorFlow</p>
-          </div>
-          <div className="skill-category">
-            <h4>Infrastructure</h4>
-            <p>AWS, Docker, Kubernetes, CI/CD, gRPC, Microservices</p>
-          </div>
-          <div className="skill-category">
-            <h4>Databases</h4>
-            <p>PostgreSQL, Redis, MongoDB</p>
-          </div>
+          {Object.entries(skills).map(([category, items]) => (
+            <div className="skill-category" key={category}>
+              <h4>{category}</h4>
+              <div className="skill-tags">
+                {items.map((skill) => (
+                  <span className="skill-tag" key={skill}>{skill}</span>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-      </section>
+      </RevealSection>
 
-      <section className="section">
-        <h2>Leadership & Education</h2>
+      <RevealSection className="section">
+        <h2 className="section-heading">Leadership & Education</h2>
         <div className="education-item">
           <div className="item-header">
             <h3>President, FAF NGO</h3>
@@ -92,7 +148,7 @@ function App() {
             <li>Secured partnerships with 10+ industry sponsors</li>
           </ul>
         </div>
-        
+
         <div className="education-item">
           <div className="item-header">
             <h3>Technical University of Moldova</h3>
@@ -100,7 +156,7 @@ function App() {
           </div>
           <div className="item-subheader">B.S. Software Engineering (Honors)</div>
         </div>
-      </section>
+      </RevealSection>
 
       <footer className="section">
         <p style={{ fontSize: '0.8rem', color: '#666' }}>

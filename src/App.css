@@ -5,6 +5,26 @@
   text-align: left;
 }
 
+/* Accent line at the top */
+.accent-line {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #646cff, #9b59b6, #646cff);
+  background-size: 200% 100%;
+  animation: gradient-slide 3s ease infinite;
+  z-index: 100;
+}
+
+@keyframes gradient-slide {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Hero */
 .hero {
   margin-bottom: 4rem;
 }
@@ -16,12 +36,28 @@
   letter-spacing: -0.02em;
 }
 
+.cursor {
+  font-weight: 300;
+  color: #646cff;
+  margin-left: 2px;
+}
+
+.cursor--blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 .hero p {
   font-size: 1.2rem;
   color: #888;
   margin-top: 0;
 }
 
+/* Link hover animation */
 .links {
   display: flex;
   gap: 1.5rem;
@@ -29,22 +65,82 @@
   font-size: 0.9rem;
 }
 
+.link-hover {
+  position: relative;
+  text-decoration: none !important;
+}
+
+.link-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #646cff;
+  transition: width 0.3s ease;
+}
+
+.link-hover:hover::after {
+  width: 100%;
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Sections */
 .section {
   margin-bottom: 3.5rem;
 }
 
-.section h2 {
+.section-heading {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #888;
-  border-bottom: 1px solid #333;
   padding-bottom: 0.5rem;
   margin-bottom: 1.5rem;
+  position: relative;
+  border-bottom: none;
 }
 
+.section-heading::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: #333;
+  width: 0;
+  transition: width 0.8s ease 0.3s;
+}
+
+.reveal--visible .section-heading::after {
+  width: 100%;
+}
+
+/* Experience items — hover lift */
 .experience-item, .education-item {
   margin-bottom: 2rem;
+  padding: 1rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.experience-item:hover, .education-item:hover {
+  transform: translateY(-3px);
+  border-color: #222;
+  box-shadow: 0 8px 24px rgba(100, 108, 255, 0.08);
 }
 
 .item-header {
@@ -81,6 +177,7 @@ li {
   color: #aaa;
 }
 
+/* Skill tags */
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -89,38 +186,78 @@ li {
 
 .skill-category h4 {
   font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.7rem;
   color: #eee;
 }
 
-.skill-category p {
-  font-size: 0.9rem;
-  color: #888;
-  margin: 0;
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
+.skill-tag {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+  color: #bbb;
+  background: #1a1a2e;
+  border: 1px solid #2a2a3e;
+  border-radius: 20px;
+  transition: all 0.25s ease;
+  cursor: default;
+}
+
+.skill-tag:hover {
+  color: #fff;
+  background: #646cff22;
+  border-color: #646cff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.15);
+}
+
+/* Mobile */
 @media (max-width: 600px) {
   .hero h1 {
     font-size: 2.5em;
   }
-  
+
   .item-header {
     flex-direction: column;
   }
-  
+
   .item-header span {
     margin-top: 0.2rem;
   }
+
+  .experience-item:hover, .education-item:hover {
+    transform: none;
+  }
 }
 
+/* Light mode */
 @media (prefers-color-scheme: light) {
-  .hero p, .section h2, .item-subheader, li, .skill-category p {
+  .hero p, .section-heading, .item-subheader, li, .skill-category p {
     color: #555;
   }
-  .section h2 {
-    border-bottom: 1px solid #eee;
+  .section-heading::after {
+    background: #eee;
   }
   .item-header h3, .skill-category h4 {
     color: #1a1a1a;
+  }
+  .experience-item:hover, .education-item:hover {
+    border-color: #e0e0e0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  }
+  .skill-tag {
+    background: #f0f0f5;
+    border-color: #ddd;
+    color: #555;
+  }
+  .skill-tag:hover {
+    background: #646cff11;
+    border-color: #646cff;
+    color: #333;
   }
 }
